@@ -38,8 +38,8 @@ def load_dataset(dataset_str, data_root, batch_size, test_batch_size, num_worker
         return None, test_loader
     elif dataset_str == 'vimeo90k':
         from data.vimeo90k import get_loader
-    elif dataset_str == 'aim':
-        from data.aim import get_loader
+    # elif dataset_str == 'aim':
+    #     from data.aim import get_loader
     elif dataset_str == 'custom':
         from data.video import get_loader
         test_loader = get_loader('test', data_root, test_batch_size, img_fmt=img_fmt, shuffle=False, num_workers=num_workers, n_frames=1)
