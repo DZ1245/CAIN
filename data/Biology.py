@@ -40,7 +40,6 @@ class Video(Dataset):
         for i in range(3):
             slice_path = os.path.join(imgpaths, str(i) + ".TIF")
             img = T(io.imread(slice_path))
-            #img = io.imread(slice_path)
             imgs.append(img)
 
         batch  = {
