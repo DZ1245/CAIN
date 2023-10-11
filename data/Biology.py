@@ -40,10 +40,16 @@ class Video(Dataset):
         for i in range(3):
             slice_path = os.path.join(imgpaths, str(i) + ".TIF")
             img = T(io.imread(slice_path))
+            #img = io.imread(slice_path)
             imgs.append(img)
-        
-        meta = {'imgpath': imgpaths}
-        return imgs, meta
+
+        batch  = {
+            'img1' : imgs[0],
+            'img2' : imgs[2],
+            'img_gt' : imgs[1],
+            'imgpath': imgpaths
+        }
+        return batch
 
     def __len__(self):
         return len(self.imglist)
