@@ -44,6 +44,9 @@ def load_dataset(dataset_str, data_root, batch_size, test_batch_size, num_worker
         from data.video import get_loader
         test_loader = get_loader('test', data_root, test_batch_size, img_fmt=img_fmt, shuffle=False, num_workers=num_workers, n_frames=1)
         return test_loader
+    elif dataset_str == 'biology':
+        from data.Biology import get_loader
+        test_loader = get_loader('test', data_root, test_batch_size, shuffle=False, num_workers=num_workers)
     else:
         raise NotImplementedError('Training / Testing for this dataset is not implemented.')
     

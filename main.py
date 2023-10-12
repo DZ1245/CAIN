@@ -54,6 +54,7 @@ elif args.model.lower() == 'cain_noca':
     model = CAIN_NoCA(depth=args.depth)
 else:
     raise NotImplementedError("Unknown model!")
+
 # Just make every model to DataParallel
 model = torch.nn.DataParallel(model).to(device)
 #print(model)
@@ -94,10 +95,12 @@ def train(args, epoch):
     criterion.train()
 
     t = time.time()
-    for i, (images, imgpaths) in enumerate(train_loader):
+    for i, batch in enumerate(train_loader):
 
         # Build input batch
-        im1, im2, gt = utils.build_input(images, imgpaths)
+        im1 = batch["img1"].to(dtype=torch.float32).to(device)
+        im2 = batch["img2"].to(dtype=torch.float32).to(device)
+        gt = batch["img_gt"].to(dtype=torch.float32).to(device)
 
         # Forward
         optimizer.zero_grad()
@@ -156,10 +159,13 @@ def test(args, epoch, eval_alpha=0.5):
 
     t = time.time()
     with torch.no_grad():
-        for i, (images, imgpaths) in enumerate(tqdm(test_loader)):
+        for i, batch in enumerate(tqdm(test_loader)):
 
             # Build input batch
-            im1, im2, gt = utils.build_input(images, imgpaths, is_training=False)
+            im1 = batch["img1"].to(dtype=torch.float32).to(device)
+            im2 = batch["img2"].to(dtype=torch.float32).to(device)
+            gt = batch["img_gt"].to(dtype=torch.float32).to(device)
+            imgpaths = batch["imgpath"]
 
             # Forward
             out, feats = model(im1, im2)
@@ -182,17 +188,17 @@ def test(args, epoch, eval_alpha=0.5):
                 print(imgpaths[1][-1])
 
             # Save result images
-            if ((epoch + 1) % 1 == 0 and i < 20) or args.mode == 'test':
-                savepath = os.path.join('checkpoint', args.exp_name, save_folder)
+            # if ((epoch + 1) % 1 == 0 and i < 20) or args.mode == 'test':
+            #     savepath = os.path.join('checkpoint', args.exp_name, save_folder)
 
-                for b in range(images[0].size(0)):
-                    paths = imgpaths[1][b].split('/')
-                    fp = os.path.join(savepath, paths[-3], paths[-2])
-                    if not os.path.exists(fp):
-                        os.makedirs(fp)
-                    # remove '.png' extension
-                    fp = os.path.join(fp, paths[-1][:-4])
-                    utils.save_image(out[b], "%s.png" % fp)
+            #     for b in range(images[0].size(0)):
+            #         paths = imgpaths[1][b].split('/')
+            #         fp = os.path.join(savepath, paths[-3], paths[-2])
+            #         if not os.path.exists(fp):
+            #             os.makedirs(fp)
+            #         # remove '.png' extension
+            #         fp = os.path.join(fp, paths[-1][:-4])
+            #         utils.save_image(out[b], "%s.png" % fp)
                     
     # Print progress
     print('im_processed: {:d}/{:d} {:.3f}s   \r'.format(i + 1, len(test_loader), time.time() - t))
