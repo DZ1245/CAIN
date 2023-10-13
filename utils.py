@@ -77,7 +77,7 @@ def build_input(images, imgpaths, is_training=True, include_edge=False, device=t
 def load_checkpoint(args, model, optimizer, fix_loaded=False):
     if args.resume_exp is None:
         args.resume_exp = args.exp_name
-    if args.mode == 'test':
+    if args.mode == 'test' :
         load_name = os.path.join('checkpoint', args.resume_exp, 'model_best.pth')
     else:
         #load_name = os.path.join('checkpoint', args.resume_exp, 'model_best.pth')

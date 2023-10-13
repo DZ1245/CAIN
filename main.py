@@ -14,6 +14,7 @@ import config
 import utils
 from loss import Loss
 
+import tifffile as tiff
 
 ##### Parse CmdLine Arguments #####
 args, unparsed = config.get_args()
@@ -22,7 +23,7 @@ print(args)
 
 
 ##### TensorBoard & Misc Setup #####
-if args.mode != 'test':
+if args.mode != 'test' or args.mode != 'inter_demo':
     writer = SummaryWriter('logs/%s' % args.exp_name)
 
 device = torch.device('cuda' if args.cuda else 'cpu')
@@ -185,9 +186,24 @@ def test(args, epoch, eval_alpha=0.5):
                 print(imgpaths)
                 print("\nLoss: %f, PSNR: %f, SSIM: %f, LPIPS: %f" %
                       (losses['total'].val, psnrs.val, ssims.val, lpips.val))
-                print(imgpaths[1][-1])
+                # print(imgpaths[1][-1])
 
             # Save result images
+            if ((epoch + 1) % 20 == 0 and i < 20) or args.mode == 'test':
+                savepath = os.path.join('checkpoint', args.exp_name, save_folder, 'demo' , str(i))
+                if not os.path.exists(savepath):
+                    os.makedirs(savepath)
+
+                save_img1 = os.path.join(savepath, 'img1.TIF')
+                save_img2 = os.path.join(savepath, 'img2.TIF')
+                save_img_gt = os.path.join(savepath, 'img_gt.TIF')
+                save_img_out = os.path.join(savepath, 'img_out.TIF')
+                
+                tiff.imwrite(save_img1, np.array(im1[0].to('cpu'), dtype=np.uint16))
+                tiff.imwrite(save_img2, np.array(im2[0].to('cpu'), dtype=np.uint16))
+                tiff.imwrite(save_img_gt, np.array(gt[0].to('cpu'), dtype=np.uint16))
+                tiff.imwrite(save_img_out, np.array(out[0].to('cpu'), dtype=np.uint16))
+
             # if ((epoch + 1) % 1 == 0 and i < 20) or args.mode == 'test':
             #     savepath = os.path.join('checkpoint', args.exp_name, save_folder)
 
@@ -199,6 +215,7 @@ def test(args, epoch, eval_alpha=0.5):
             #         # remove '.png' extension
             #         fp = os.path.join(fp, paths[-1][:-4])
             #         utils.save_image(out[b], "%s.png" % fp)
+            
                     
     # Print progress
     print('im_processed: {:d}/{:d} {:.3f}s   \r'.format(i + 1, len(test_loader), time.time() - t))
@@ -217,7 +234,6 @@ def test(args, epoch, eval_alpha=0.5):
             optimizer.param_groups[-1]['lr'], epoch * len(train_loader) + i, mode='test')
 
     return losses['total'].avg, psnrs.avg, ssims.avg, lpips.avg
-
 
 """ Entry Point """
 def main(args):

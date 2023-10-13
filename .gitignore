@@ -8,6 +8,7 @@ checkpoint/*
 logs/*
 data/vimeo_triplet
 data/CAIN_data
+data/CAIN_dataV2
 
 
 # Created by .ignore support plugin (hsz.mobi)
