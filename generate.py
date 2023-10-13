@@ -61,7 +61,6 @@ if args.resume:
     del checkpoint
 
 
-
 def test(args, epoch):
     print('Evaluating for epoch = %d' % epoch)
     ##### Load Dataset #####

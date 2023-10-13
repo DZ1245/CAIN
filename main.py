@@ -99,9 +99,9 @@ def train(args, epoch):
     for i, batch in enumerate(train_loader):
 
         # Build input batch
-        im1 = batch["img1"].to(dtype=torch.float32).to(device)
-        im2 = batch["img2"].to(dtype=torch.float32).to(device)
-        gt = batch["img_gt"].to(dtype=torch.float32).to(device)
+        im1 = batch["img1"].to(device)
+        im2 = batch["img2"].to(device)
+        gt = batch["img_gt"].to(device)
 
         # Forward
         optimizer.zero_grad()
@@ -163,9 +163,9 @@ def test(args, epoch, eval_alpha=0.5):
         for i, batch in enumerate(tqdm(test_loader)):
 
             # Build input batch
-            im1 = batch["img1"].to(dtype=torch.float32).to(device)
-            im2 = batch["img2"].to(dtype=torch.float32).to(device)
-            gt = batch["img_gt"].to(dtype=torch.float32).to(device)
+            im1 = batch["img1"].to(device)
+            im2 = batch["img2"].to(device)
+            gt = batch["img_gt"].to(device)
             imgpaths = batch["imgpath"]
 
             # Forward
@@ -199,10 +199,15 @@ def test(args, epoch, eval_alpha=0.5):
                 save_img_gt = os.path.join(savepath, 'img_gt.TIF')
                 save_img_out = os.path.join(savepath, 'img_out.TIF')
                 
-                tiff.imwrite(save_img1, np.array(im1[0].to('cpu'), dtype=np.uint16))
-                tiff.imwrite(save_img2, np.array(im2[0].to('cpu'), dtype=np.uint16))
-                tiff.imwrite(save_img_gt, np.array(gt[0].to('cpu'), dtype=np.uint16))
-                tiff.imwrite(save_img_out, np.array(out[0].to('cpu'), dtype=np.uint16))
+                save_imagepath = os.path.join(savepath, 'imagepath.txt')
+                with open(save_imagepath, 'a') as f:
+                    f.write(imgpaths[0])
+
+
+                tiff.imwrite(save_img1, np.array(im1[0].to('cpu')))
+                tiff.imwrite(save_img2, np.array(im2[0].to('cpu')))
+                tiff.imwrite(save_img_gt, np.array(gt[0].to('cpu')))
+                tiff.imwrite(save_img_out, np.array(out[0].to('cpu')))
 
             # if ((epoch + 1) % 1 == 0 and i < 20) or args.mode == 'test':
             #     savepath = os.path.join('checkpoint', args.exp_name, save_folder)
