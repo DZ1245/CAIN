@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CUDA_VISIBLE_DEVICES=1 python Biology_generate.py \
+CUDA_VISIBLE_DEVICES=7 python Biology_generate.py \
     --exp_name CAINv2_train \
     --dataset biology \
     --model cain \
